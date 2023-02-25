@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  my-sql:
+    image: mysql:8.0
+    ports:
+      - '3308:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: amadeus
+      MYSQL_USER: congminh
+      MYSQL_PASSWORD: congminh
+    volumes:
+      - ./data/mysql:/var/lib/mysql
