@@ -458,4 +458,513 @@ export class SearchShoppingService {
       return err;
     }
   }
+
+  async getListOfFlightAvailabilitiesBaseOnSearchingCriteria() {
+    try {
+      const dataToken = (await this.authService
+        .getAccessToken()
+        .toPromise()) as any;
+
+      const data = this.httpService
+        .post(
+          `https://test.api.amadeus.com/v1/shopping/availability/flight-availabilities`,
+          {
+            originDestinations: [
+              {
+                id: '1',
+                originLocationCode: 'BOS',
+                destinationLocationCode: 'MAD',
+                departureDateTime: {
+                  date: '2023-11-14',
+                  time: '21:15:00',
+                },
+              },
+            ],
+            travelers: [
+              {
+                id: '1',
+                travelerType: 'ADULT',
+              },
+            ],
+            sources: ['GDS'],
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + dataToken?.access_token,
+            },
+          },
+        )
+        .pipe(
+          map((axiosResponse: AxiosResponse) => {
+            return axiosResponse.data;
+          }),
+        );
+
+      return data;
+    } catch (err) {
+      console.log('abc');
+      return err;
+    }
+  }
+
+  async getListOfUpsellFlightOffersBasedOnGivenFlightOffers() {
+    try {
+      const dataToken = (await this.authService
+        .getAccessToken()
+        .toPromise()) as any;
+
+      const data = this.httpService
+        .post(
+          `https://test.api.amadeus.com/v1/shopping/flight-offers/upselling`,
+          {
+            data: {
+              type: 'flight-offers-upselling',
+              flightOffers: [
+                {
+                  type: 'flight-offer',
+                  id: '1',
+                  source: 'GDS',
+                  instantTicketingRequired: false,
+                  nonHomogeneous: false,
+                  oneWay: false,
+                  lastTicketingDate: '2021-07-04',
+                  numberOfBookableSeats: 2,
+                  itineraries: [
+                    {
+                      duration: 'PT2H5M',
+                      segments: [
+                        {
+                          departure: {
+                            iataCode: 'CDG',
+                            terminal: '2F',
+                            at: '2021-07-04T09:30:00',
+                          },
+                          arrival: {
+                            iataCode: 'MAD',
+                            terminal: '2',
+                            at: '2021-07-04T11:35:00',
+                          },
+                          carrierCode: 'AF',
+                          number: '1300',
+                          aircraft: {
+                            code: '321',
+                          },
+                          operating: {
+                            carrierCode: 'AF',
+                          },
+                          duration: 'PT2H5M',
+                          id: '2',
+                          numberOfStops: 0,
+                          blacklistedInEU: false,
+                        },
+                      ],
+                    },
+                    {
+                      duration: 'PT1H55M',
+                      segments: [
+                        {
+                          departure: {
+                            iataCode: 'MAD',
+                            terminal: '2',
+                            at: '2021-07-11T18:35:00',
+                          },
+                          arrival: {
+                            iataCode: 'ORY',
+                            terminal: '1',
+                            at: '2021-07-11T20:30:00',
+                          },
+                          carrierCode: 'AF',
+                          number: '9433',
+                          aircraft: {
+                            code: '318',
+                          },
+                          operating: {
+                            carrierCode: 'AF',
+                          },
+                          duration: 'PT1H55M',
+                          id: '14',
+                          numberOfStops: 0,
+                          blacklistedInEU: false,
+                        },
+                      ],
+                    },
+                  ],
+                  price: {
+                    currency: 'EUR',
+                    total: '410.86',
+                    base: '240.00',
+                    fees: [
+                      {
+                        amount: '0.00',
+                        type: 'SUPPLIER',
+                      },
+                      {
+                        amount: '0.00',
+                        type: 'TICKETING',
+                      },
+                    ],
+                    grandTotal: '410.86',
+                    additionalServices: [
+                      {
+                        amount: '60.00',
+                        type: 'CHECKED_BAGS',
+                      },
+                    ],
+                  },
+                  pricingOptions: {
+                    fareType: ['PUBLISHED'],
+                    includedCheckedBagsOnly: false,
+                  },
+                  validatingAirlineCodes: ['AF'],
+                  travelerPricings: [
+                    {
+                      travelerId: '1',
+                      fareOption: 'STANDARD',
+                      travelerType: 'ADULT',
+                      price: {
+                        currency: 'EUR',
+                        total: '201.96',
+                        base: '126.00',
+                      },
+                      fareDetailsBySegment: [
+                        {
+                          segmentId: '2',
+                          cabin: 'ECONOMY',
+                          fareBasis: 'AS50OALG',
+                          brandedFare: 'LIGHT1',
+                          class: 'A',
+                          includedCheckedBags: {
+                            quantity: 0,
+                          },
+                        },
+                        {
+                          segmentId: '14',
+                          cabin: 'ECONOMY',
+                          fareBasis: 'VS50OALG',
+                          brandedFare: 'LIGHT1',
+                          class: 'V',
+                          includedCheckedBags: {
+                            quantity: 0,
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      travelerId: '2',
+                      fareOption: 'STANDARD',
+                      travelerType: 'CHILD',
+                      price: {
+                        currency: 'EUR',
+                        total: '176.96',
+                        base: '101.00',
+                      },
+                      fareDetailsBySegment: [
+                        {
+                          segmentId: '2',
+                          cabin: 'ECONOMY',
+                          fareBasis: 'AS50OALG',
+                          brandedFare: 'LIGHT1',
+                          class: 'A',
+                        },
+                        {
+                          segmentId: '14',
+                          cabin: 'ECONOMY',
+                          fareBasis: 'VS50OALG',
+                          brandedFare: 'LIGHT1',
+                          class: 'V',
+                        },
+                      ],
+                    },
+                    {
+                      travelerId: '3',
+                      fareOption: 'STANDARD',
+                      travelerType: 'HELD_INFANT',
+                      associatedAdultId: '1',
+                      price: {
+                        currency: 'EUR',
+                        total: '31.94',
+                        base: '13.00',
+                      },
+                      fareDetailsBySegment: [
+                        {
+                          segmentId: '2',
+                          cabin: 'ECONOMY',
+                          fareBasis: 'AS50OALG',
+                          brandedFare: 'LIGHT1',
+                          class: 'A',
+                        },
+                        {
+                          segmentId: '14',
+                          cabin: 'ECONOMY',
+                          fareBasis: 'VS50OALG',
+                          brandedFare: 'LIGHT1',
+                          class: 'V',
+                        },
+                      ],
+                    },
+                  ],
+                  fareRules: {
+                    rules: [
+                      {
+                        category: 'EXCHANGE',
+                        maxPenaltyAmount: '0.00',
+                      },
+                      {
+                        category: 'REVALIDATION',
+                        notApplicable: true,
+                      },
+                    ],
+                  },
+                },
+              ],
+              payments: [
+                {
+                  brand: 'VISA_IXARIS',
+                  binNumber: 123456,
+                  flightOfferIds: [1],
+                },
+              ],
+            },
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + dataToken?.access_token,
+            },
+          },
+        )
+        .pipe(
+          map((axiosResponse: AxiosResponse) => {
+            return axiosResponse.data;
+          }),
+        );
+
+      return data;
+    } catch (err) {
+      console.log('abc');
+      return err;
+    }
+  }
+
+  async getAllTheSeatMapsOfAGivenOrder() {
+    try {
+      const dataToken = (await this.authService
+        .getAccessToken()
+        .toPromise()) as any;
+
+      const data = this.httpService
+        .get(
+          `https://test.api.amadeus.com/v1/shopping/seatmaps?flightOrderId=MlpZVkFMfFdBVFNPTnwyMDE1LTExLTAy&flight-orderId=MlpZVkFMfFdBVFNPTnwyMDE1LTExLTAy`,
+          {
+            headers: {
+              Authorization: 'Bearer ' + dataToken?.access_token,
+            },
+          },
+        )
+        .pipe(
+          map((axiosResponse: AxiosResponse) => {
+            return axiosResponse.data;
+          }),
+        );
+
+      return data;
+    } catch (err) {
+      console.log('abc');
+      return err;
+    }
+  }
+
+  async getAllTheSeatMapsOfAGivenFlightOffer() {
+    try {
+      const dataToken = (await this.authService
+        .getAccessToken()
+        .toPromise()) as any;
+
+      const data = this.httpService
+        .post(
+          `https://test.api.amadeus.com/v1/shopping/seatmaps`,
+          {
+            data: [
+              {
+                type: 'flight-offer',
+                id: '1',
+                source: 'GDS',
+                instantTicketingRequired: false,
+                nonHomogeneous: false,
+                oneWay: false,
+                lastTicketingDate: '2023-08-01',
+                numberOfBookableSeats: 9,
+                itineraries: [
+                  {
+                    duration: 'PT1H30M',
+                    segments: [
+                      {
+                        departure: {
+                          iataCode: 'NCE',
+                          terminal: '2',
+                          at: '2023-08-01T06:45:00',
+                        },
+                        arrival: {
+                          iataCode: 'ORY',
+                          terminal: '2',
+                          at: '2023-08-01T08:15:00',
+                        },
+                        carrierCode: 'AF',
+                        number: '6201',
+                        aircraft: {
+                          code: '320',
+                        },
+                        operating: {
+                          carrierCode: 'AF',
+                        },
+                        duration: 'PT1H30M',
+                        id: '1',
+                        numberOfStops: 0,
+                        blacklistedInEU: false,
+                      },
+                    ],
+                  },
+                  {
+                    duration: 'PT1H25M',
+                    segments: [
+                      {
+                        departure: {
+                          iataCode: 'ORY',
+                          terminal: '3',
+                          at: '2023-08-18T06:35:00',
+                        },
+                        arrival: {
+                          iataCode: 'NCE',
+                          terminal: '2',
+                          at: '2023-08-18T08:00:00',
+                        },
+                        carrierCode: 'AF',
+                        number: '6200',
+                        aircraft: {
+                          code: '320',
+                        },
+                        operating: {
+                          carrierCode: 'AF',
+                        },
+                        duration: 'PT1H25M',
+                        id: '4',
+                        numberOfStops: 0,
+                        blacklistedInEU: false,
+                      },
+                    ],
+                  },
+                ],
+                price: {
+                  currency: 'EUR',
+                  total: '274.60',
+                  base: '80.00',
+                  fees: [
+                    {
+                      amount: '0.00',
+                      type: 'SUPPLIER',
+                    },
+                    {
+                      amount: '0.00',
+                      type: 'TICKETING',
+                    },
+                  ],
+                  grandTotal: '274.60',
+                  additionalServices: [
+                    {
+                      amount: '60.00',
+                      type: 'CHECKED_BAGS',
+                    },
+                  ],
+                },
+                pricingOptions: {
+                  fareType: ['PUBLISHED'],
+                  includedCheckedBagsOnly: false,
+                },
+                validatingAirlineCodes: ['AF'],
+                travelerPricings: [
+                  {
+                    travelerId: '1',
+                    fareOption: 'STANDARD',
+                    travelerType: 'ADULT',
+                    price: {
+                      currency: 'EUR',
+                      total: '137.30',
+                      base: '40.00',
+                    },
+                    fareDetailsBySegment: [
+                      {
+                        segmentId: '1',
+                        cabin: 'ECONOMY',
+                        fareBasis: 'XS50MALG',
+                        brandedFare: 'LIGHT',
+                        class: 'X',
+                        includedCheckedBags: {
+                          quantity: 0,
+                        },
+                      },
+                      {
+                        segmentId: '4',
+                        cabin: 'ECONOMY',
+                        fareBasis: 'XS50MALG',
+                        brandedFare: 'LIGHT',
+                        class: 'X',
+                        includedCheckedBags: {
+                          quantity: 0,
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    travelerId: '2',
+                    fareOption: 'STANDARD',
+                    travelerType: 'ADULT',
+                    price: {
+                      currency: 'EUR',
+                      total: '137.30',
+                      base: '40.00',
+                    },
+                    fareDetailsBySegment: [
+                      {
+                        segmentId: '1',
+                        cabin: 'ECONOMY',
+                        fareBasis: 'XS50MALG',
+                        brandedFare: 'LIGHT',
+                        class: 'X',
+                        includedCheckedBags: {
+                          quantity: 0,
+                        },
+                      },
+                      {
+                        segmentId: '4',
+                        cabin: 'ECONOMY',
+                        fareBasis: 'XS50MALG',
+                        brandedFare: 'LIGHT',
+                        class: 'X',
+                        includedCheckedBags: {
+                          quantity: 0,
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + dataToken?.access_token,
+            },
+          },
+        )
+        .pipe(
+          map((axiosResponse: AxiosResponse) => {
+            return axiosResponse.data;
+          }),
+        );
+
+      return data;
+    } catch (err) {
+      console.log('abc');
+      return err;
+    }
+  }
 }

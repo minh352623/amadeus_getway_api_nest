@@ -114,4 +114,48 @@ export class SearchShoppingController {
       console.log(e);
     }
   }
+
+  //Flight Availabilities Search
+  @Post('list-of-Flight-Availabilities-base-on-searching-criteria')
+  getListOfFlightAvailabilitiesBaseOnSearchingCriteria() {
+    try {
+      return this.searchShoppingService.getListOfFlightAvailabilitiesBaseOnSearchingCriteria();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // /Branded Fares Upsell
+  //Return a list of upsell Flight Offers based on given Flight Offers
+  //faild docs
+  @Post('list-of-upsell-Flight-Offers-based-on-given-Flight-Offers')
+  getListOfUpsellFlightOffersBasedOnGivenFlightOffers() {
+    try {
+      return this.searchShoppingService.getListOfUpsellFlightOffersBasedOnGivenFlightOffers();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //Seatrmap Display
+
+  //Returns all the seat maps of a given order.
+  @Get('get-all-the-seat-maps-of-a-given-order')
+  getAllTheSeatMapsOfAGivenOrder() {
+    try {
+      return this.searchShoppingService.getAllTheSeatMapsOfAGivenOrder();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //Returns all the seat maps of a given flightOffer.
+  @Post('get-all-the-seat-maps-of-a-given-flightOffer')
+  getAllTheSeatMapsOfAGivenFlightOffer() {
+    try {
+      return this.searchShoppingService.getAllTheSeatMapsOfAGivenFlightOffer();
+    } catch (e) {
+      console.log(e);
+    }
+  }
 }
