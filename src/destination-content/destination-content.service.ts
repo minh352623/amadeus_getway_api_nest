@@ -1,86 +1,20 @@
-import { HttpService } from '@nestjs/axios/dist';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { Observable, map } from 'rxjs';
 import { AuthService } from 'src/auth/auth.service';
+
 @Injectable()
-export class HotelService implements OnModuleInit {
+export class DestinationContentService {
   constructor(
     private readonly httpService: HttpService,
     private readonly authService: AuthService,
   ) {}
 
-  onModuleInit() {
-    console.log('onModuleI');
-  }
-
-  async getHotelsUsingItsUniqueId(hotelIds: string[]) {
-    try {
-      const dataToken = (await this.authService
-        .getAccessToken()
-        .toPromise()) as any;
-
-      console.log(dataToken.access_token);
-
-      const data = this.httpService
-        .get(
-          `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-hotels?hotelIds=${hotelIds}`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + dataToken?.access_token,
-            },
-          },
-        )
-        .pipe(
-          map((axiosResponse: AxiosResponse) => {
-            return axiosResponse.data;
-          }),
-        );
-      // console.log('abc');
-
-      return data;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getHotelsInACity(cityCode: string, radius: number, radiusUnit: string) {
-    try {
-      const dataToken = (await this.authService
-        .getAccessToken()
-        .toPromise()) as any;
-
-      console.log(dataToken.access_token);
-
-      const data = this.httpService
-        .get(
-          `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}&radius=${
-            radius || 5
-          }&radiusUnit=${radiusUnit || 'KM'}&hotelSource=ALL`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + dataToken?.access_token,
-            },
-          },
-        )
-        .pipe(
-          map((axiosResponse: AxiosResponse) => {
-            return axiosResponse.data;
-          }),
-        );
-      // console.log('abc');
-
-      return data;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getHotelsInGeocode(
+  async getPointsOfInterestForAGivenLocationAndradius(
     latitude: number,
     longitude: number,
     radius: number,
-    radiusUnit: string,
   ) {
     try {
       const dataToken = (await this.authService
@@ -91,9 +25,9 @@ export class HotelService implements OnModuleInit {
 
       const data = this.httpService
         .get(
-          `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-geocode?latitude=${latitude}&longitude=${longitude}&radius=${
-            radius || 5
-          }&radiusUnit=${radiusUnit || 'KM'}&hotelSource=ALL`,
+          `https://test.api.amadeus.com/v1/reference-data/locations/pois?latitude=${latitude}&longitude=${longitude}&radius=${
+            radius || 1
+          }&page%5Blimit%5D=10&page%5Boffset%5D=0`,
           {
             headers: {
               Authorization: 'Bearer ' + dataToken?.access_token,
@@ -113,15 +47,11 @@ export class HotelService implements OnModuleInit {
     }
   }
 
-  async getMultiHotelOffers(
-    hotelIds: string[],
-    adults: number = 1,
-    checkInDate: string = '2023-11-22',
-    checkOutDate: string,
-    countryOfResidence: string,
-    roomQuantity: number,
-    priceRange: string,
-    currency: string,
+  async getPointsOfInterestForAGivenArea(
+    north: number,
+    west: number,
+    south: number,
+    east: number,
   ) {
     try {
       const dataToken = (await this.authService
@@ -132,11 +62,7 @@ export class HotelService implements OnModuleInit {
 
       const data = this.httpService
         .get(
-          `https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=${hotelIds}&adults=${
-            adults || 1
-          }&checkInDate=${checkInDate || '2023-11-22'}&roomQuantity=${
-            roomQuantity || 1
-          }&paymentPolicy=NONE&bestRateOnly=true`,
+          `https://test.api.amadeus.com/v1/reference-data/locations/pois/by-square?north=${north}&west=${west}&south=${south}&east=${east}&page%5Blimit%5D=10&page%5Boffset%5D=0`,
           {
             headers: {
               Authorization: 'Bearer ' + dataToken?.access_token,
@@ -155,17 +81,16 @@ export class HotelService implements OnModuleInit {
       console.log(e);
     }
   }
-  async getOfferPricing(offerId: string) {
+
+  async getOnePointOfInterestByItsId(poisId: string) {
     try {
       const dataToken = (await this.authService
         .getAccessToken()
         .toPromise()) as any;
-
-      console.log(dataToken.access_token);
 
       const data = this.httpService
         .get(
-          `https://test.api.amadeus.com/v3/shopping/hotel-offers/${offerId}`,
+          `https://test.api.amadeus.com/v1/reference-data/locations/pois/${poisId}`,
           {
             headers: {
               Authorization: 'Bearer ' + dataToken?.access_token,
@@ -185,109 +110,104 @@ export class HotelService implements OnModuleInit {
     }
   }
 
-  async hotelBooking() {
-    try {
-      const dataToken = (await this.authService
-        .getAccessToken()
-        .toPromise()) as any;
-
-      const data = this.httpService
-        .post(
-          `https://test.api.amadeus.com/v1/booking/hotel-bookings`,
-          {
-            data: {
-              offerId: 'NRPQNQBOJM',
-              guests: [
-                {
-                  name: {
-                    title: 'MR',
-                    firstName: 'BOB',
-                    lastName: 'SMITH',
-                  },
-                  contact: {
-                    phone: '+33679278416',
-                    email: 'bob.smith@email.com',
-                  },
-                },
-              ],
-              payments: [
-                {
-                  method: 'creditCard',
-                  card: {
-                    vendorCode: 'VI',
-                    cardNumber: '4111111111111111',
-                    expiryDate: '2026-01',
-                  },
-                },
-              ],
-            },
-          },
-          {
-            headers: {
-              Authorization: 'Bearer ' + dataToken?.access_token,
-            },
-          },
-        )
-        .pipe(
-          map((axiosResponse: AxiosResponse) => {
-            return axiosResponse.data;
-          }),
-        );
-
-      return data;
-    } catch (err) {
-      console.log('abc');
-      return err;
-    }
-  }
-
-  async getSentimentsByAmadeusHotelIds(hotelIds: string[]) {
-    try {
-      const dataToken = (await this.authService
-        .getAccessToken()
-        .toPromise()) as any;
-
-      console.log(dataToken.access_token);
-
-      const data = this.httpService
-        .get(
-          `https://test.api.amadeus.com/v2/e-reputation/hotel-sentiments?hotelIds=${hotelIds}`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + dataToken?.access_token,
-            },
-          },
-        )
-        .pipe(
-          map((axiosResponse: AxiosResponse) => {
-            return axiosResponse.data;
-          }),
-        );
-      // console.log('abc');
-
-      return data;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getAListOfHotelsMatchingAGivenKeyword(
-    keyword: string,
-    subType: string[],
-    countryCode: string,
+  async getActivitiesAroundAGivenLocation(
+    latitude: number,
+    longitude: number,
+    radius: number,
   ) {
     try {
       const dataToken = (await this.authService
         .getAccessToken()
         .toPromise()) as any;
 
-      console.log(dataToken.access_token);
+      const data = this.httpService
+        .get(
+          `https://test.api.amadeus.com/v1/shopping/activities?latitude=${latitude}&longitude=${longitude}&radius=${
+            radius || 1
+          }`,
+          {
+            headers: {
+              Authorization: 'Bearer ' + dataToken?.access_token,
+            },
+          },
+        )
+        .pipe(
+          map((axiosResponse: AxiosResponse) => {
+            return axiosResponse.data;
+          }),
+        );
+      return data;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getActivitiesAroundAGivenLocation4Directions(
+    north: number,
+    west: number,
+    south: number,
+    east: number,
+  ) {
+    try {
+      const dataToken = (await this.authService
+        .getAccessToken()
+        .toPromise()) as any;
 
       const data = this.httpService
         .get(
-          `https://test.api.amadeus.com/v1/reference-data/locations/hotel?keyword=${keyword}&subType=${subType}&countryCode=${
-            countryCode || 'FR'
-          }&lang=EN&max=20`,
+          `https://test.api.amadeus.com/v1/shopping/activities/by-square?north=${north}&west=${west}&south=${south}&east=${east}`,
+          {
+            headers: {
+              Authorization: 'Bearer ' + dataToken?.access_token,
+            },
+          },
+        )
+        .pipe(
+          map((axiosResponse: AxiosResponse) => {
+            return axiosResponse.data;
+          }),
+        );
+      return data;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getOneActivityByItsId(activityId: string) {
+    try {
+      const dataToken = (await this.authService
+        .getAccessToken()
+        .toPromise()) as any;
+
+      const data = this.httpService
+        .get(
+          `https://test.api.amadeus.com/v1/shopping/activities/${activityId}`,
+          {
+            headers: {
+              Authorization: 'Bearer ' + dataToken?.access_token,
+            },
+          },
+        )
+        .pipe(
+          map((axiosResponse: AxiosResponse) => {
+            return axiosResponse.data;
+          }),
+        );
+      return data;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getCategoryRatedAreas(latitude: number, longitude: number) {
+    try {
+      const dataToken = (await this.authService
+        .getAccessToken()
+        .toPromise()) as any;
+
+      const data = this.httpService
+        .get(
+          `https://test.api.amadeus.com/v1/location/analytics/category-rated-areas?latitude=${latitude}&longitude=${longitude}`,
           {
             headers: {
               Authorization: 'Bearer ' + dataToken?.access_token,
