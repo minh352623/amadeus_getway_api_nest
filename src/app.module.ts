@@ -7,6 +7,8 @@ import { HotelEntity } from './hotel/hotel.entity';
 import { HotelModule } from './hotel/hotel.module';
 import { Covid19Module } from './covid-19/covid-19.module';
 import { SearchShoppingModule } from './search-shopping/search-shopping.module';
+import { DestinationContentModule } from './destination-content/destination-content.module';
+import { TripModule } from './trip/trip.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { SearchShoppingModule } from './search-shopping/search-shopping.module';
     AuthModule,
     Covid19Module,
     SearchShoppingModule,
+    DestinationContentModule,
+    TripModule,
   ],
   controllers: [AppController],
   providers: [AppService],
