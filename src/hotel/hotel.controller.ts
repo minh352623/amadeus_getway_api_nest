@@ -5,6 +5,24 @@ import { HotelService } from './hotel.service';
 export class HotelsController {
   constructor(private readonly hotelService: HotelService) {}
 
+  //Graphql
+
+  @Get('get-hotels-by-keyword')
+  async getHotelsByName(@Query('keyword') keyword: string) {
+    try {
+      console.log(keyword);
+
+      const data = await this.hotelService.getHotels(keyword);
+      // console.log(data);
+
+      return data;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  //controller
+
   //Search Hotels using its unique Id
   @Get('get-hotels-using-its-unique-id')
   getHotelsUsingItsUniqueId(@Query('hotelIds') hotelIds: string[]) {

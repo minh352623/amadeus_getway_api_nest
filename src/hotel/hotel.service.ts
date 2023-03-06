@@ -27,16 +27,41 @@ export class HotelService implements OnModuleInit {
 
   //graphql
 
-  async saveHotel(data: object) {
+  async saveHotel(data: object): Promise<Hotel> {
     try {
       return new this.hotelModel(data).save();
     } catch (e) {
       console.log(e);
     }
   }
-  async getHotels() {
+  async getHotels(keyword: string): Promise<Hotel[]> {
     try {
-      return await this.hotelModel.find();
+      const filter = {
+        $or: [
+          {
+            name: new RegExp(keyword, 'i'),
+          },
+          {
+            hotelId: new RegExp(keyword, 'i'),
+          },
+          {
+            iataCode: new RegExp(keyword, 'i'),
+          },
+        ],
+      };
+      const data = await this.hotelModel.find(filter);
+
+      const length = data.length;
+
+      if (length == 0) {
+        console.log('call api amadeus');
+
+        const data = await this.getHotelsInACity(keyword, 100);
+        this.hotelModel.insertMany(data);
+        return data;
+      }
+
+      return data;
     } catch (e) {
       console.log(e);
     }
@@ -72,7 +97,11 @@ export class HotelService implements OnModuleInit {
     }
   }
 
-  async getHotelsInACity(cityCode: string, radius: number, radiusUnit: string) {
+  async getHotelsInACity(
+    cityCode: string,
+    radius: number,
+    radiusUnit: string = 'KM',
+  ) {
     try {
       const dataToken = (await this.authService
         .getAccessToken()
@@ -97,9 +126,9 @@ export class HotelService implements OnModuleInit {
       //     return axiosResponse.data;
       //   }),
       // );
-      console.log(response.data.data);
+      // console.log(response.data.data);
 
-      await this.hotelModel.insertMany(response.data.data);
+      // await this.hotelModel.insertMany(response.data.data);
 
       return response.data.data;
     } catch (e) {

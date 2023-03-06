@@ -42,8 +42,8 @@ export class HotelResolver {
   }
 
   @Query((returns) => [HotelType])
-  hotels() {
-    return this.hotelService.getHotels();
+  hotels(@Args('keyword') keyword: string) {
+    return this.hotelService.getHotels(keyword);
   }
 
   @Mutation((returns) => HotelType)
