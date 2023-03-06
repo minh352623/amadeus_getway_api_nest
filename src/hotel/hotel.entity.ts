@@ -7,11 +7,11 @@ export class HotelEntity extends BaseEntity {
   @Column({
     length: 50,
   })
-  nameaaa: string;
+  name: string;
 
   @Column()
-  price: string;
+  dupeId: string;
 
   @Column()
-  address: string;
+  hotelId: string;
 }

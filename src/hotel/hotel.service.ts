@@ -1,19 +1,72 @@
 import { HttpService } from '@nestjs/axios/dist';
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
+import { Model } from 'mongoose';
 import { Observable, map } from 'rxjs';
 import { AuthService } from 'src/auth/auth.service';
+import { Repository } from 'typeorm';
+import { HotelEntity } from './hotel.entity';
+import { Hotel, HotelDocument } from './schemas/hotel.schema';
+import { InjectModel } from '@nestjs/mongoose';
+
 @Injectable()
 export class HotelService implements OnModuleInit {
   constructor(
     private readonly httpService: HttpService,
     private readonly authService: AuthService,
+    // @InjectRepository(HotelEntity)
+    // private readonly hotelsRepository: Repository<HotelEntity>,
+    @InjectModel(Hotel.name)
+    private hotelModel: Model<HotelDocument>,
   ) {}
 
   onModuleInit() {
     console.log('onModuleI');
   }
 
+  //graphql
+
+  async saveHotel(data: object): Promise<Hotel> {
+    try {
+      return new this.hotelModel(data).save();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  async getHotels(keyword: string): Promise<Hotel[]> {
+    try {
+      const filter = {
+        $or: [
+          {
+            name: new RegExp(keyword, 'i'),
+          },
+          {
+            hotelId: new RegExp(keyword, 'i'),
+          },
+          {
+            iataCode: new RegExp(keyword, 'i'),
+          },
+        ],
+      };
+      const data = await this.hotelModel.find(filter);
+
+      const length = data.length;
+
+      if (length == 0) {
+        console.log('call api amadeus');
+
+        const data = await this.getHotelsInACity(keyword, 100);
+        this.hotelModel.insertMany(data);
+        return data;
+      }
+
+      return data;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  //contorller
   async getHotelsUsingItsUniqueId(hotelIds: string[]) {
     try {
       const dataToken = (await this.authService
@@ -44,7 +97,11 @@ export class HotelService implements OnModuleInit {
     }
   }
 
-  async getHotelsInACity(cityCode: string, radius: number, radiusUnit: string) {
+  async getHotelsInACity(
+    cityCode: string,
+    radius: number,
+    radiusUnit: string = 'KM',
+  ) {
     try {
       const dataToken = (await this.authService
         .getAccessToken()
@@ -52,7 +109,7 @@ export class HotelService implements OnModuleInit {
 
       console.log(dataToken.access_token);
 
-      const data = this.httpService
+      const response = await this.httpService
         .get(
           `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}&radius=${
             radius || 5
@@ -63,14 +120,17 @@ export class HotelService implements OnModuleInit {
             },
           },
         )
-        .pipe(
-          map((axiosResponse: AxiosResponse) => {
-            return axiosResponse.data;
-          }),
-        );
-      // console.log('abc');
+        .toPromise();
+      // .pipe(
+      //   map((axiosResponse: AxiosResponse) => {
+      //     return axiosResponse.data;
+      //   }),
+      // );
+      // console.log(response.data.data);
 
-      return data;
+      // await this.hotelModel.insertMany(response.data.data);
+
+      return response.data.data;
     } catch (e) {
       console.log(e);
     }
