@@ -32,7 +32,9 @@ export class HotelsController {
           status: 400,
           message: 'hotelIds not null',
         };
-      return this.hotelService.getHotelsUsingItsUniqueId(hotelIds);
+      console.log(hotelIds);
+
+      return this.hotelService.getHotelsUsingItsUniqueIdVer2(hotelIds);
     } catch (e) {
       console.log(e);
     }

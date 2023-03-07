@@ -32,6 +32,7 @@ import GraphQLJSON from 'graphql-type-json';
       autoSchemaFile: true,
       sortSchema: true,
       playground: true,
+
       debug: false,
       resolvers: { JSON: GraphQLJSON },
     }),
