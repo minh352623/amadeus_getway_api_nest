@@ -66,6 +66,25 @@ export class HotelService implements OnModuleInit {
       console.log(e);
     }
   }
+
+  async getHotel(id: string[]): Promise<Hotel> {
+    try {
+      const data = await this.hotelModel.findOne({
+        hotelId: id,
+      });
+      console.log(data);
+      if (!data) {
+        console.log('call hotel amadeus');
+
+        const hotel = await this.getHotelsUsingItsUniqueId(id);
+        this.saveHotel(hotel);
+        return hotel;
+      }
+      return data;
+    } catch (e) {
+      console.log(e);
+    }
+  }
   //contorller
   async getHotelsUsingItsUniqueId(hotelIds: string[]) {
     try {
@@ -73,9 +92,34 @@ export class HotelService implements OnModuleInit {
         .getAccessToken()
         .toPromise()) as any;
 
-      console.log(dataToken.access_token);
+      const response = await this.httpService
+        .get(
+          `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-hotels?hotelIds=${hotelIds}`,
+          {
+            headers: {
+              Authorization: 'Bearer ' + dataToken?.access_token,
+            },
+          },
+        )
+        .toPromise();
+      console.log(response.data.data[0]);
 
-      const data = this.httpService
+      if (!response.data.data[0])
+        return {
+          message: 'Hotel dose not exist',
+        };
+      return response.data.data[0];
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  async getHotelsUsingItsUniqueIdVer2(hotelIds: string[]) {
+    try {
+      const dataToken = (await this.authService
+        .getAccessToken()
+        .toPromise()) as any;
+
+      const response = this.httpService
         .get(
           `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-hotels?hotelIds=${hotelIds}`,
           {
@@ -89,9 +133,12 @@ export class HotelService implements OnModuleInit {
             return axiosResponse.data;
           }),
         );
-      // console.log('abc');
 
-      return data;
+      if (!response)
+        return {
+          message: 'Hotel dose not exist',
+        };
+      return response;
     } catch (e) {
       console.log(e);
     }

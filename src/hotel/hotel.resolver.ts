@@ -7,38 +7,8 @@ export class HotelResolver {
   constructor(private readonly hotelService: HotelService) {}
 
   @Query((returns) => HotelType)
-  hotel() {
-    return {
-      _id: '6405968d7de2dfab5e635963',
-      chainCode: 'HS',
-      iataCode: 'XVL',
-      geoCode: {
-        latitude: '10.32341',
-        longitude: '106.01731',
-      },
-      name: 'MEKONGRIVERSIDE BOUTIQUERESORT-SPA',
-      distance: {
-        value: '42.69',
-        unit: 'KM',
-      },
-      dupeId: '700889504',
-      hotelId: 'HSXVLAAB',
-      lastUpdate: {
-        $date: {
-          $numberLong: '1669676631000',
-        },
-      },
-      createdAt: {
-        $date: {
-          $numberLong: '1678087821594',
-        },
-      },
-      updatedAt: {
-        $date: {
-          $numberLong: '1678087821594',
-        },
-      },
-    };
+  hotel(@Args({ name: 'id', type: () => [String] }) id: string[]) {
+    return this.hotelService.getHotel(id);
   }
 
   @Query((returns) => [HotelType])
